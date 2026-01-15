@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Produkty</h2>
+<div style="display:flex;gap:1rem;flex-wrap:wrap;">
+{% for p in products %}
+  <article style="border:1px solid #ddd;padding:1rem;width:220px;">
+    <img src="{{ url_for('static_img', filename=p['img']) }}" alt="" style="width:100%;height:120px;object-fit:cover;">
+    <h3><a href="{{ url_for('product', product_id=p['id']) }}">{{ p['name'] }}</a></h3>
+    <p>{{ p['price'] }} Kč</p>
+    <form action="{{ url_for('add_to_cart', product_id=p['id']) }}" method="post">
+      <input type="number" name="quantity" value="1" min="1" style="width:60px;">
+      <button type="submit">Přidat do košíku</button>
+    </form>
+    {% if user and user['is_admin'] == 1 %}
+      <p><a href="{{ url_for('admin_products_edit', product_id=p['id']) }}">Upravit</a></p>
+    {% endif %}
+  </article>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin — Produkty</h2>
+<p><a href="{{ url_for('admin_products_new') }}">Nový produkt</a></p>
+<table>
+  <thead><tr><th>ID</th><th>Název</th><th>Cena</th><th>Akce</th></tr></thead>
+  <tbody>
+  {% for p in products %}
+    <tr>
+      <td>{{ p['id'] }}</td>
+      <td>{{ p['name'] }}</td>
+      <td>{{ p['price'] }} Kč</td>
+      <td>
+        <a href="{{ url_for('admin_products_edit', product_id=p['id']) }}">Upravit</a> |
+        <a href="{{ url_for('admin_products_delete', product_id=p['id']) }}">Smazat</a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

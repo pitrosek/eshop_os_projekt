@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Flask E-shop</title>
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+</head>
+<body>
+<header>
+  <h1><a href="{{ url_for('home') }}">Flask E-shop</a></h1>
+  <nav>
+    <a href="{{ url_for('home') }}">Domů</a>
+    <a href="{{ url_for('cart') }}">Košík ({{ session.get('cart')|length if session.get('cart') else 0 }})</a>
+    {% if user %}
+      <span>Vítej, {{ user['username'] }}!</span>
+      <a href="{{ url_for('logout') }}">Odhlásit</a>
+      {% if user['is_admin'] == 1 %}
+        <a href="{{ url_for('admin_products') }}">Admin</a>
+      {% endif %}
+    {% else %}
+      <a href="{{ url_for('login') }}">Přihlásit</a>
+      <a href="{{ url_for('register') }}">Registrovat</a>
+    {% endif %}
+  </nav>
+</header>
+
+<main>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+      {% for m in messages %}
+        <li>{{ m }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  <small>Ukázkový projekt — neproduktivní verze</small>
+</footer>
+</body>
+</html>
