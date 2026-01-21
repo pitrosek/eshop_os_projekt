@@ -1,11 +1,6 @@
 {% extends "base.html" %}
+{% import 'macros.html' as macros %}
 {% block content %}
 <h2>{% if product %}Upravit{% else %}Nový{% endif %} produkt</h2>
-<form method="post">
-  <label>Název <input name="name" value="{{ product['name'] if product }}"></label><br>
-  <label>Popis <textarea name="description">{{ product['description'] if product }}</textarea></label><br>
-  <label>Cena (Kč) <input name="price" type="number" value="{{ product['price'] if product }}"></label><br>
-  <label>Obrázek (soubor ve static/img) <input name="img" value="{{ product['img'] if product }}"></label><br>
-  <button type="submit">Uložit</button>
-</form>
+{{ macros.render_product_form(product) }}
 {% endblock %}

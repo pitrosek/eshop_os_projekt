@@ -1,0 +1,106 @@
+{% macro render_product_card(product, user=None) %}
+  <article style="border:1px solid #ddd;padding:1rem;width:220px;">
+    <img src="{{ url_for('static_img', filename=product['img']) }}" alt="{{ product['name'] }}" style="width:100%;height:120px;object-fit:cover;">
+    <h3><a href="{{ url_for('product', product_id=product['id']) }}">{{ product['name'] }}</a></h3>
+    <p><strong>{{ product['price'] }} Kč</strong></p>
+    <form action="{{ url_for('add_to_cart', product_id=product['id']) }}" method="post">
+      <input type="number" name="quantity" value="1" min="1" style="width:60px;">
+      <button type="submit">Přidat do košíku</button>
+    </form>
+    {% if user and user['is_admin'] == 1 %}
+      <p><small><a href="{{ url_for('admin_products_edit', product_id=product['id']) }}">Upravit</a></small></p>
+    {% endif %}
+  </article>
+{% endmacro %}
+
+{% macro render_form_input(name, label, type='text', value='', required=True, placeholder='') %}
+  <label>
+    {{ label }}
+    {% if type == 'textarea' %}
+      <textarea name="{{ name }}" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>{{ value }}</textarea>
+    {% else %}
+      <input type="{{ type }}" name="{{ name }}" value="{{ value }}" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>
+    {% endif %}
+  </label><br>
+{% endmacro %}
+
+{% macro render_product_form(product=None) %}
+  <form method="post">
+    {{ render_form_input('name', 'Název', value=(product['name'] if product else '')) }}
+    {{ render_form_input('description', 'Popis', type='textarea', value=(product['description'] if product else ''), required=False) }}
+    {{ render_form_input('price', 'Cena (Kč)', type='number', value=(product['price'] if product else '')) }}
+    {{ render_form_input('img', 'Obrázek (soubor ve static/img)', value=(product['img'] if product else 'placeholder.png'), required=False) }}
+    <button type="submit">Uložit</button>
+  </form>
+{% endmacro %}
+
+{% macro render_cart_table(items, total) %}
+  {% if items %}
+    <table>
+      <thead><tr><th>Produkt</th><th>Množství</th><th>Jedn. cena</th><th>Celkem</th><th></th></tr></thead>
+      <tbody>
+      {% for it in items %}
+        <tr>
+          <td>{{ it.product['name'] }}</td>
+          <td>{{ it.qty }}</td>
+          <td>{{ it.product['price'] }} Kč</td>
+          <td>{{ it.subtotal }} Kč</td>
+          <td><a href="{{ url_for('cart_remove', product_id=it.product['id']) }}">Odebrat</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p>Celkem: <strong>{{ total }} Kč</strong></p>
+    <form action="{{ url_for('checkout') }}" method="post">
+      <button type="submit">Dokončit nákup</button>
+    </form>
+  {% else %}
+    <p>Košík je prázdný.</p>
+  {% endif %}
+{% endmacro %}
+
+{% macro render_admin_products_table(products) %}
+  <table>
+    <thead><tr><th>ID</th><th>Název</th><th>Cena</th><th>Akce</th></tr></thead>
+    <tbody>
+    {% for p in products %}
+      <tr>
+        <td>{{ p['id'] }}</td>
+        <td>{{ p['name'] }}</td>
+        <td>{{ p['price'] }} Kč</td>
+        <td>
+          <a href="{{ url_for('admin_products_edit', product_id=p['id']) }}">Upravit</a> |
+          <a href="{{ url_for('admin_products_delete', product_id=p['id']) }}">Smazat</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
+{% macro render_flash_messages() %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul style="background:#f0f0f0;border:1px solid #ccc;padding:1rem;border-radius:4px;">
+      {% for m in messages %}
+        <li>{{ m }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+{% endmacro %}
+
+{% macro render_nav_links(user) %}
+  <a href="{{ url_for('home') }}">Domů</a>
+  <a href="{{ url_for('cart') }}">Košík ({{ session.get('cart')|length if session.get('cart') else 0 }})</a>
+  {% if user %}
+    <span>Vítej, {{ user['username'] }}!</span>
+    <a href="{{ url_for('logout') }}">Odhlásit</a>
+    {% if user['is_admin'] == 1 %}
+      <a href="{{ url_for('admin_products') }}">Admin</a>
+    {% endif %}
+  {% else %}
+    <a href="{{ url_for('login') }}">Přihlásit</a>
+    <a href="{{ url_for('register') }}">Registrovat</a>
+  {% endif %}
+{% endmacro %}

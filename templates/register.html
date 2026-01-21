@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% import 'macros.html' as macros %}
 {% block content %}
 <h2>Registrace</h2>
 <form method="post">
-  <label>Uživatelské jméno <input name="username"></label><br>
-  <label>Heslo <input type="password" name="password"></label><br>
+  {{ macros.render_form_input('username', 'Uživatelské jméno') }}
+  {{ macros.render_form_input('password', 'Heslo', type='password') }}
   <button type="submit">Registrovat</button>
 </form>
 {% endblock %}
